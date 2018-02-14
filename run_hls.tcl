@@ -16,7 +16,7 @@ open_project -reset proj0
 #add_files -tb simple_algo_mt_test.cpp 
 #add_files -tb simple_algo_mt_ref.cpp
 
-set_top simple_algo_flow_hw
+set_top simple_algo_flow_hw_v0
 add_files src/simple_algo_flow.cpp
 add_files -tb simple_algo_flow_test.cpp 
 
