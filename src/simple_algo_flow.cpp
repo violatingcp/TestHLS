@@ -75,20 +75,57 @@ void simple_algo_flow_hw_v1(mytype input[9], mytype dummy[3], mytype output[9]){
 #pragma HLS ARRAY_PARTITION variable=C1_out complete
   
   for(int i = 0; i < 3; i++) { 
-  A1[i] = input[i];
-  B1[i] = input[3+i];
-  C1[i] = input[6+i];
-  A1_out[i] = 0;
-  B1_out[i] = 0;
-  C1_out[i] = 0;
+    A1[i] = input[i];
+    B1[i] = input[3+i];
+    C1[i] = input[6+i];
+    A1_out[i] = 0;
+    B1_out[i] = 0;
+    C1_out[i] = 0;
   }
-    node(A1, dummy,   A1_out);
-    node(B1, A1_out,  B1_out);
-    node(C1, B1_out,  C1_out);
-    for(int i = 0; i < 3; i++) { 
-      //#pragma HLS unroll
-      output[i]   = A1_out[i];
-      output[3+i] = B1_out[i];
-      output[6+i] = C1_out[i];  
-    }  
+  node(A1, dummy,   A1_out);
+  node(B1, A1_out,  B1_out);
+  node(C1, B1_out,  C1_out);
+  for(int i = 0; i < 3; i++) { 
+    //#pragma HLS unroll
+    output[i]   = A1_out[i];
+    output[3+i] = B1_out[i];
+    output[6+i] = C1_out[i];  
+  }  
+}
+void simple_algo_flow_hw_v2(mytype input[9], mytype dummy[3], mytype output[9]){
+#pragma HLS ARRAY_PARTITION variable=input  dim=1 complete 
+#pragma HLS ARRAY_PARTITION variable=output dim=1 complete 
+#pragma HLS ARRAY_PARTITION variable=dummy  complete
+#pragma HLS PIPELINE
+
+  mytype A1[3][3];
+  
+  mytype A1_out[3];
+  mytype B1_out[3];
+  mytype C1_out[3];
+#pragma HLS ARRAY_PARTITION variable=A1 dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=A1_out complete
+#pragma HLS ARRAY_PARTITION variable=B1_out complete
+#pragma HLS ARRAY_PARTITION variable=C1_out complete
+  
+  for(int i = 0; i < 3; i++) { 
+    A1[0][i] = input[i];
+    A1[1][i] = input[3+i];
+    A1[2][i] = input[6+i];
+    A1_out[i] = dummy[i];
+    B1_out[i] = 0;
+    C1_out[i] = 0;
+  }
+  for(int i = 0; i < 3; i++) { 
+    node(A1[i], A1_out,   A1_out);
+    for(int j = 0; j < 3; j++) output[i*3+j] = A1_out[j];  
+  }
+  /*
+  for(int i = 0; i < 3; i++) { 
+    //#pragma HLS unroll
+    output[i]   = A1_out[i];
+    output[3+i] = B1_out[i];
+    output[6+i] = C1_out[i];  
+  } 
+  */ 
 }
